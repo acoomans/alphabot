@@ -3,7 +3,7 @@ import sys
 print(sys.version)
 
 from bottle import route, run, response
-from camera import HTTPMJPEGStream
+from utils.mjpeg import HTTPMJPEGStream
 
 
 @route('/')
