@@ -1,6 +1,10 @@
 import picamera
+import os
 import sys
 import threading
+
+
+os.sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 print(sys.version)
 
