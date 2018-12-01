@@ -1,12 +1,10 @@
+#!/usr/bin/python
+
 import picamera
+from pkg_resources import resource_filename
 import os
 import sys
 import threading
-
-
-os.sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-print(sys.version)
 
 from bottle import (
     get,
@@ -19,11 +17,13 @@ from bottle import (
     template,
 )
 
-from waveshare.AlphaBot import AlphaBot
-from waveshare.PCA9685 import PCA9685
+parent_dir = os.path.split(os.path.dirname(__file__))[-1]
+if dir == 'scripts':
+    sys.path.append(os.path.join(parent_dir, '..'))
 
-from utils.mjpeg import HTTPMJPEGStream
-
+from alphabot_control_lib.utils.mjpeg import HTTPMJPEGStream
+from alphabot_control_lib.waveshare.AlphaBot import AlphaBot
+from alphabot_control_lib.waveshare.PCA9685 import PCA9685
 
 Ab = AlphaBot()
 pwm = PCA9685(0x40)
@@ -39,20 +39,22 @@ VPulse = 1500  #Sets the initial Pulse
 VStep = 0      #Sets the initial step length
 pwm.setServoPulse(1,VPulse)
 
+data_path = resource_filename('alphabot_control_lib', 'data')
+
 
 @get('/')
 def index():
-    return template("www/index")
+    return template(os.path.join(data_path, 'index.html'))
 
 
 @route('/<filename>')
 def server_static(filename):
-    return static_file(filename, root='www/')
+    return static_file(filename, root=data_path)
 
 
 @route('/fonts/<filename>')
 def server_fonts(filename):
-    return static_file(filename, root='www/fonts/')
+    return static_file(filename, root=os.path.join(data_path, 'fonts'))
 
 
 
@@ -132,4 +134,9 @@ t = threading.Timer(0.02, timerfunc)
 t.setDaemon(True)
 t.start()
 
-run(server='paste', host='alphabot.local', port=8080)
+
+def main():
+    run(server='paste', host='alphabot.local', port=8080)
+
+if __name__ == "__main__":
+    main()
